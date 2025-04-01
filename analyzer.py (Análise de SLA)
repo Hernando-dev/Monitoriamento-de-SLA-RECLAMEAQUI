@@ -1,0 +1,13 @@
+from datetime import datetime, timedelta
+
+def check_sla(df: pd.DataFrame, sla_hours: int = 48) -> pd.DataFrame:
+    """
+    Analisa violações de SLA com base no tempo de resposta
+    """
+    now = datetime.now()
+    df['data_parser'] = pd.to_datetime(df['data'], format='%d/%m/%Y %H:%M')
+    df['horas_atraso'] = (now - df['data_parser']).dt.total_seconds() / 3600
+    df['sla_status'] = df['horas_atraso'].apply(
+        lambda x: "VIOLADO" if x > sla_hours else "EM RISCO" if x > sla_hours*0.75 else "DENTRO"
+    )
+    return df
