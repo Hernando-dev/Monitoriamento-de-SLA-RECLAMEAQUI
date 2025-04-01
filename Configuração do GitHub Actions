@@ -1,0 +1,26 @@
+name: SLA Monitor
+on:
+  schedule:
+    - cron: "0 9-18 * * 1-5"  # Dias úteis, das 9h às 18h
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+          
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pandas scikit-learn beautifulsoup4
+          
+      - name: Run Bot
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: |
+          python src/main.py
