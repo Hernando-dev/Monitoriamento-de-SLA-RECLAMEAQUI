@@ -1,0 +1,18 @@
+import requests
+import json
+
+def send_slack_alert(complaint: dict, webhook_url: str):
+    message = {
+        "text": f"🚨 *ALERTA DE SLA* - {complaint['empresa'].upper()}",
+        "attachments": [
+            {
+                "color": "#ff0000",
+                "fields": [
+                    {"title": "Reclamação", "value": complaint["titulo"]},
+                    {"title": "Tempo de Resposta", "value": f"{complaint['horas_atraso']:.1f}h"},
+                    {"title": "Status", "value": complaint["sla_status"]}
+                ]
+            }
+        ]
+    }
+    requests.post(webhook_url, json=message)
