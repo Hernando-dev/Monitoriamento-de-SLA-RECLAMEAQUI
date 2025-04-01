@@ -1,0 +1,22 @@
+from scraper import scrape_complaints
+from analyzer import check_sla
+from predictor import predict_sla_risk
+from notifier import send_slack_alert
+import pandas as pd
+
+# Configurações
+EMPRESAS = ["loja-xyz", "empresa-abc"]
+SLACK_WEBHOOK = "https://hooks.slack.com/services/..."
+
+def main():
+    for empresa in EMPRESAS:
+        df = scrape_complaints(empresa)
+        df = check_sla(df)
+        
+        for _, row in df[df["sla_status"] != "DENTRO"].iterrows():
+            risk = predict_sla_risk(row.to_dict())
+            if risk > 0.7:  # Threshold
+                send_slack_alert(row.to_dict(), SLACK_WEBHOOK)
+
+if __name__ == "__main__":
+    main()
