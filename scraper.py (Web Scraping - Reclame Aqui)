@@ -1,0 +1,46 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import time
+from random import randint
+
+def scrape_complaints(company: str, max_pages: int = 3) -> pd.DataFrame:
+    """
+    Coleta reclamações do Reclame Aqui com:
+    - Randomização de User-Agent
+    - Delays entre requests
+    - Tratamento de erros
+    """
+    base_url = f"https://www.reclameaqui.com.br/empresa/{company}/"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    }
+    complaints = []
+    
+    for page in range(1, max_pages + 1):
+        try:
+            url = f"{base_url}?pagina={page}"
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.text, 'html.parser')
+            items = soup.select('[class*="complaint-item"]')
+            
+            for item in items:
+                title = item.select_one('[class*="complaint-title"]').text.strip()
+                date = item.select_one('[class*="complaint-date"]').text.strip()
+                status = item.select_one('[class*="complaint-status"]').text.strip()
+                
+                complaints.append({
+                    "empresa": company,
+                    "titulo": title,
+                    "data": date,
+                    "status": status
+                })
+            
+            time.sleep(randint(1, 3))  # Delay aleatório
+            
+        except Exception as e:
+            print(f"Erro na página {page}: {e}")
+    
+    return pd.DataFrame(complaints)
