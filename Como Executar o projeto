@@ -1,0 +1,13 @@
+Como Executar o projeto!
+pip install -r requirements.txt
+python src/main.py
+streamlit run dashboard.py
+Este projeto demonstra:
+
+✅ Scraping ético com tratamento de erros
+
+✅ Pipeline completo de dados
+
+✅ Integração com Slack/Jira
+
+✅ Dashboard interativo
