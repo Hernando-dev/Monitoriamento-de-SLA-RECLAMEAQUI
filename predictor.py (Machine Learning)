@@ -1,0 +1,28 @@
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+import joblib
+
+def train_model():
+    # Dataset sintético (substituir por dados reais)
+    data = pd.DataFrame({
+        "horas_atraso": [10, 24, 50, 30, 45],
+        "dia_semana": [1, 5, 3, 2, 4],
+        "violou_sla": [0, 0, 1, 0, 1]
+    })
+    
+    X = data[["horas_atraso", "dia_semana"]]
+    y = data["violou_sla"]
+    
+    model = RandomForestClassifier()
+    model.fit(X, y)
+    joblib.dump(model, "data/model.pkl")
+
+def predict_sla_risk(complaint: dict) -> float:
+    """Retorna probabilidade de violação"""
+    model = joblib.load("data/model.pkl")
+    features = [[
+        complaint["horas_atraso"],
+        datetime.now().weekday()
+    ]]
+    return model.predict_proba(features)[0][1]
